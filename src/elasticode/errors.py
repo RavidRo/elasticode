@@ -29,5 +29,5 @@ class ExportError(ElasticodeError):
     """Raised when exporting resources from a cluster fails."""
 
 
-class ConnectionError(ElasticodeError):
+class ClusterConnectionError(ElasticodeError):
     """Raised when unable to connect to the Elasticsearch cluster."""

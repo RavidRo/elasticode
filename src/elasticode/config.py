@@ -93,16 +93,15 @@ def _parse_auth(cluster_name: str, raw: Any) -> AuthConfig:
                 f"Cluster '{cluster_name}': basic auth requires 'username' and 'password'."
             )
         return AuthConfig(type="basic", username=raw["username"], password=raw["password"])
-    elif auth_type == "api_key":
+    if auth_type == "api_key":
         if "api_key" not in raw:
             raise ConfigError(f"Cluster '{cluster_name}': api_key auth requires 'api_key'.")
         return AuthConfig(type="api_key", api_key=raw["api_key"])
-    elif auth_type == "bearer":
+    if auth_type == "bearer":
         if "token" not in raw:
             raise ConfigError(f"Cluster '{cluster_name}': bearer auth requires 'token'.")
         return AuthConfig(type="bearer", token=raw["token"])
-    else:
-        raise ConfigError(f"Cluster '{cluster_name}': unknown auth type '{auth_type}'.")
+    raise ConfigError(f"Cluster '{cluster_name}': unknown auth type '{auth_type}'.")
 
 
 def _parse_tls(raw: Any) -> TlsConfig:

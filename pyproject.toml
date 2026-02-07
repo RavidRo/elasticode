@@ -51,7 +51,59 @@ src = ["src", "tests"]
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "TCH", "RUF", "PTH"]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "RUF",  # ruff-specific rules
+    "FAST", # FastAPI
+    "PIE",  # flake8-pie
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "ANN",  # flake8-annotations
+    "S",    # flake8-bandit
+    "BLE",  # flake8-blind-except
+    "A",    # flake8-builtins
+    "COM",  # flake8-commas
+    "DTZ",  # flake8-datetimez
+    "FA",   # flake8-future-annotations
+    "T20",  # flake8-print
+    "PT",   # flake8-pytest-style
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SLOT", # flake8-slots
+    "ARG",  # flake8-unused-arguments
+    "PTH",  # flake8-use-pathlib
+    "FLY",  # flynt
+    "PGH",  # pygrep-hooks
+    "FURB", # refurb
+]
+
+ignore = [
+    "S101", # assert - We like asserts, they can be very concise
+
+    # We don't care about cybersecurity
+    "S104", # hardcoded-bind-all-interfaces
+    "S603", # subprocess-without-shell-equals-true
+    "S607", # start-process-with-partial-path
+
+    # Formatter conflicting rules
+    "COM812", # missing-trailing-comma
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Blind exception catch is intentional during apply operations
+"src/elasticode/applier.py" = ["BLE001"]
+
+# Any types are necessary for YAML parsing (untyped input)
+"src/elasticode/config.py" = ["ANN401"]
+
+# Test files can have hardcoded passwords and unused fixtures
+"tests/*" = ["S105", "S106", "ARG002"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["elasticode"]
@@ -70,7 +122,7 @@ mypy_path = "src"
 # Type check tests as well
 [[tool.mypy.overrides]]
 module = "tests.*"
-disallow_untyped_defs = false  # Tests can be less strict
+disallow_untyped_defs = false # Tests can be less strict
 
 [[tool.mypy.overrides]]
 module = "deepdiff.*"
