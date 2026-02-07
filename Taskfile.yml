@@ -73,18 +73,33 @@ tasks:
       - uv run bump-my-version show current_version
       - uv run bump-my-version show-bump
 
+  version:check:
+    desc: Verify CHANGELOG has been updated since last release
+    cmds:
+      - |
+        echo "Checking CHANGELOG.md for unreleased changes..."
+        if ! grep -A 50 "## \[Unreleased\]" CHANGELOG.md | grep -q "^- "; then
+          echo "❌ Error: No changes found in [Unreleased] section of CHANGELOG.md"
+          echo "Please add your changes to the CHANGELOG before bumping version."
+          exit 1
+        fi
+        echo "✅ CHANGELOG has been updated"
+
   version:patch:
     desc: Bump patch version (0.1.0 → 0.1.1)
+    deps: [version:check]
     cmds:
       - uv run bump-my-version bump patch
 
   version:minor:
     desc: Bump minor version (0.1.0 → 0.2.0)
+    deps: [version:check]
     cmds:
       - uv run bump-my-version bump minor
 
   version:major:
     desc: Bump major version (0.1.0 → 1.0.0)
+    deps: [version:check]
     cmds:
       - uv run bump-my-version bump major
 
