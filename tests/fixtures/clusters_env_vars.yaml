@@ -1,0 +1,9 @@
+clusters:
+  production:
+    url: "https://es-prod.example.com:9200"
+    auth:
+      type: "basic"
+      username: "${ES_USERNAME}"
+      password: "${ES_PASSWORD}"
+    tls:
+      verify: true

@@ -1,0 +1,17 @@
+{
+  "description": "Parse log messages",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": ["%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:msg}"]
+      }
+    },
+    {
+      "date": {
+        "field": "timestamp",
+        "formats": ["ISO8601"]
+      }
+    }
+  ]
+}

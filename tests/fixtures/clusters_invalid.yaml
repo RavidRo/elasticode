@@ -1,0 +1,5 @@
+clusters:
+  broken:
+    auth:
+      type: "basic"
+      username: "elastic"

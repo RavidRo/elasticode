@@ -1,0 +1,16 @@
+clusters:
+  local:
+    url: "http://localhost:9200"
+    auth:
+      type: "basic"
+      username: "elastic"
+      password: "changeme"
+    tls:
+      verify: false
+  staging:
+    url: "https://es-staging.example.com:9200"
+    auth:
+      type: "api_key"
+      api_key: "test-api-key"
+    tls:
+      verify: true
