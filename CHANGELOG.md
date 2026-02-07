@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-02-07
-
 ### Added
 
 - `elasticode init` command to scaffold new projects with example files and directory structure
@@ -16,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `elasticode plan` command to preview changes with colored diff output (Terraform-like dry run)
 - `elasticode apply` command to apply changes to clusters with confirmation prompt
 - `elasticode export` command to fetch existing cluster resources and write them as local JSON files
-- Support for 4 Elasticsearch resource types: index templates, component templates, ILM policies, and ingest pipelines
+- Support for 4 Elasticsearch resource types: index templates, component templates, ILM policies, indices, and ingest pipelines
+- Create-only mode for indices to prevent accidental data loss (updates and deletes are blocked by default)
+- Safety guardrails: indices cannot be updated in-place or deleted through Elasticode
+- System indices (starting with `.`) are automatically filtered from export and list operations
 - Multi-cluster support via `clusters.yaml` configuration file
 - Environment variable interpolation (`${ENV_VAR}`) in cluster configuration
 - Three authentication methods: basic auth, API key, and bearer token

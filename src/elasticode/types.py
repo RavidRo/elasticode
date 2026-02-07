@@ -13,6 +13,7 @@ class ResourceType(Enum):
     COMPONENT_TEMPLATE = "component_templates"
     ILM_POLICY = "ilm_policies"
     INGEST_PIPELINE = "ingest_pipelines"
+    INDEX = "indices"
 
 
 class ResourceAction(Enum):

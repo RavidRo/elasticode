@@ -6,7 +6,7 @@ Define your Elasticsearch resources as JSON files, organize them by type, and us
 
 ## Features
 
-- **Declarative resource management** -- define index templates, component templates, ILM policies, and ingest pipelines as JSON files
+- **Declarative resource management** -- define index templates, component templates, ILM policies, ingest pipelines, and indices as JSON files
 - **Plan/apply workflow** -- preview changes before applying them, just like Terraform
 - **Export existing resources** -- fetch resources from a cluster and save them as local JSON files for easy migration
 - **Multi-cluster support** -- manage multiple Elasticsearch clusters from a single config file
@@ -40,7 +40,8 @@ This creates a starter project structure:
 │   └── example-logs.json
 ├── component_templates/
 ├── ilm_policies/
-└── ingest_pipelines/
+├── ingest_pipelines/
+└── indices/
 ```
 
 ### 2. Configure your clusters
@@ -239,12 +240,27 @@ Options:
 
 ## Supported Resources
 
-| Resource | Directory | Elasticsearch API |
-|---|---|---|
-| Index templates | `index_templates/` | `_index_template` |
-| Component templates | `component_templates/` | `_component_template` |
-| ILM policies | `ilm_policies/` | `_ilm/policy` |
-| Ingest pipelines | `ingest_pipelines/` | `_ingest/pipeline` |
+| Resource | Directory | Elasticsearch API | Notes |
+|---|---|---|---|
+| Index templates | `index_templates/` | `_index_template` | |
+| Component templates | `component_templates/` | `_component_template` | |
+| ILM policies | `ilm_policies/` | `_ilm/policy` | |
+| Ingest pipelines | `ingest_pipelines/` | `_ingest/pipeline` | |
+| Indices | `indices/` | `/{index}` | **Create-only** for safety (updates/deletes blocked) |
+
+### Index Safety
+
+Indices are treated specially for safety because they contain data:
+
+- **Creating new indices**: Allowed — define settings and mappings in JSON files
+- **Updating existing indices**: Blocked — indices are largely immutable (most settings/mappings can't be changed)
+- **Deleting indices**: Blocked — use the Elasticsearch API directly if you need to delete an index
+
+This create-only mode prevents accidental data loss. If you need to modify an existing index, you should:
+1. Use the Elasticsearch API to update dynamic settings that support updates
+2. Or use the reindex API to create a new index with updated mappings
+
+System indices (those starting with `.` like `.kibana`, `.security`) are automatically filtered from `export` and `list` operations.
 
 ## Configuration
 

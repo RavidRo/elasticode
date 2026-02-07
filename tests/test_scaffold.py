@@ -37,8 +37,8 @@ class TestScaffoldProject:
     def test_returns_created_paths(self, tmp_path: Path) -> None:
         created = scaffold_project(tmp_path)
         assert len(created) > 0
-        # Should have 4 dirs + clusters.yaml + example + .gitignore = 7
-        assert len(created) == 7
+        # Should have 5 dirs + clusters.yaml + example + .gitignore = 8
+        assert len(created) == 8
 
     def test_does_not_overwrite_existing_files(self, tmp_path: Path) -> None:
         # First scaffold

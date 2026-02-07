@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from elasticode.resources.component_template import ComponentTemplateHandler
 from elasticode.resources.ilm_policy import IlmPolicyHandler
+from elasticode.resources.index import IndexHandler
 from elasticode.resources.index_template import IndexTemplateHandler
 from elasticode.resources.ingest_pipeline import IngestPipelineHandler
 from elasticode.types import ResourceType
@@ -20,6 +21,7 @@ HANDLER_CLASSES: dict[ResourceType, type[ResourceHandler]] = {
     ResourceType.COMPONENT_TEMPLATE: ComponentTemplateHandler,
     ResourceType.ILM_POLICY: IlmPolicyHandler,
     ResourceType.INGEST_PIPELINE: IngestPipelineHandler,
+    ResourceType.INDEX: IndexHandler,
 }
 
 
