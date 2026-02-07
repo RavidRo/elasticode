@@ -76,3 +76,34 @@ class TestIndexTemplateHandler:
         }
         result = handler.normalize(body)
         assert result == body
+
+    def test_list_all_returns_all_templates(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.indices.get_index_template.return_value = {
+            "index_templates": [
+                {"name": "logs", "index_template": {"index_patterns": ["logs-*"]}},
+                {"name": "metrics", "index_template": {"index_patterns": ["metrics-*"]}},
+            ]
+        }
+        handler = IndexTemplateHandler(mock_es_client)
+        result = handler.list_all()
+        assert len(result) == 2
+        assert result["logs"] == {"index_patterns": ["logs-*"]}
+        assert result["metrics"] == {"index_patterns": ["metrics-*"]}
+
+    def test_list_all_empty(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.indices.get_index_template.return_value = {"index_templates": []}
+        handler = IndexTemplateHandler(mock_es_client)
+        assert handler.list_all() == {}
+
+    def test_list_all_normalizes_bodies(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.indices.get_index_template.return_value = {
+            "index_templates": [
+                {
+                    "name": "logs",
+                    "index_template": {"index_patterns": ["logs-*"], "version": 3},
+                }
+            ]
+        }
+        handler = IndexTemplateHandler(mock_es_client)
+        result = handler.list_all()
+        assert "version" not in result["logs"]

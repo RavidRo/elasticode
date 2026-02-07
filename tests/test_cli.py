@@ -7,6 +7,7 @@ from click.testing import CliRunner
 
 from elasticode.cli import main
 from elasticode.types import (
+    ExportResult,
     Plan,
     PlanItem,
     ResourceAction,
@@ -283,6 +284,88 @@ class TestCliApply:
         )
         assert result.exit_code == 1
         assert "nonexistent" in result.output
+
+
+class TestCliExport:
+    def test_export_unknown_cluster(self, cli_runner: CliRunner, fixtures_dir: Path) -> None:
+        result = cli_runner.invoke(
+            main,
+            [
+                "--config",
+                str(fixtures_dir / "clusters.yaml"),
+                "export",
+                "--cluster",
+                "nonexistent",
+            ],
+        )
+        assert result.exit_code == 1
+        assert "nonexistent" in result.output
+        assert "Available" in result.output
+
+    @patch("elasticode.cli.create_client")
+    @patch("elasticode.cli.export_resources")
+    def test_export_success(
+        self,
+        mock_export: MagicMock,
+        mock_client: MagicMock,
+        cli_runner: CliRunner,
+        fixtures_dir: Path,
+    ) -> None:
+        mock_export.return_value = ExportResult(
+            cluster_name="local",
+            exported=[(ResourceType.INDEX_TEMPLATE, "logs")],
+            skipped=[],
+        )
+        result = cli_runner.invoke(
+            main,
+            [
+                "--config",
+                str(fixtures_dir / "clusters.yaml"),
+                "export",
+                "--cluster",
+                "local",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "Exported 1" in result.output
+        assert "OK" in result.output
+
+    @patch("elasticode.cli.create_client")
+    @patch("elasticode.cli.export_resources")
+    def test_export_with_skips(
+        self,
+        mock_export: MagicMock,
+        mock_client: MagicMock,
+        cli_runner: CliRunner,
+        fixtures_dir: Path,
+    ) -> None:
+        mock_export.return_value = ExportResult(
+            cluster_name="local",
+            exported=[],
+            skipped=[(ResourceType.INDEX_TEMPLATE, "logs", "file already exists")],
+        )
+        result = cli_runner.invoke(
+            main,
+            [
+                "--config",
+                str(fixtures_dir / "clusters.yaml"),
+                "export",
+                "--cluster",
+                "local",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "SKIP" in result.output
+        assert "file already exists" in result.output
+        assert "--force" in result.output
+
+    def test_export_missing_config(self, cli_runner: CliRunner) -> None:
+        result = cli_runner.invoke(
+            main,
+            ["--config", "/nonexistent/clusters.yaml", "export", "--cluster", "local"],
+        )
+        assert result.exit_code == 1
+        assert "Error" in result.output
 
 
 class TestCliVersion:

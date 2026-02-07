@@ -8,6 +8,7 @@ Define your Elasticsearch resources as JSON files, organize them by type, and us
 
 - **Declarative resource management** -- define index templates, component templates, ILM policies, and ingest pipelines as JSON files
 - **Plan/apply workflow** -- preview changes before applying them, just like Terraform
+- **Export existing resources** -- fetch resources from a cluster and save them as local JSON files for easy migration
 - **Multi-cluster support** -- manage multiple Elasticsearch clusters from a single config file
 - **Environment variable interpolation** -- keep secrets out of config files with `${ENV_VAR}` references
 - **Colored diff output** -- see exactly what will change before applying
@@ -175,9 +176,39 @@ Options:
 
 Commands:
   init       Scaffold a new Elasticode project
+  export     Export resources from a cluster to local JSON files
   validate   Validate JSON resource files and cluster config
   plan       Show what changes would be made (dry run)
   apply      Apply changes to a cluster
+```
+
+### `elasticode export`
+
+Fetch existing resources from a cluster and write them as JSON files. Useful for migrating an existing cluster to Elasticode management.
+
+```
+Options:
+  --cluster TEXT       Target cluster name (required)
+  -t, --resource-type  Filter by type (repeatable)
+  -r, --resource TEXT  Filter by resource name (repeatable)
+  -d, --directory PATH Output directory (default: current directory)
+  -f, --force          Overwrite existing files
+```
+
+Example:
+
+```bash
+# Export all resources from production cluster
+elasticode export --cluster production
+
+# Export only index templates
+elasticode export --cluster production -t index_templates
+
+# Export to a specific directory
+elasticode export --cluster production -d ./backup
+
+# Overwrite existing files
+elasticode export --cluster production --force
 ```
 
 ### `elasticode plan`

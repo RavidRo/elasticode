@@ -9,6 +9,7 @@ from elasticode.applier import apply_plan
 from elasticode.client import create_client
 from elasticode.config import load_config
 from elasticode.errors import ElasticodeError
+from elasticode.exporter import export_resources
 from elasticode.loader import validate_resources
 from elasticode.output import display_plan, display_plan_json
 from elasticode.planner import generate_plan
@@ -74,6 +75,89 @@ def init(directory: str) -> None:
         "  4. Run [bold]elasticode plan --cluster <name>[/bold] to preview changes\n"
         "  5. Run [bold]elasticode apply --cluster <name>[/bold] to apply changes"
     )
+
+
+@main.command(name="export")
+@click.option("--cluster", required=True, help="Target cluster name from clusters.yaml.")
+@click.option(
+    "--resource-type",
+    "-t",
+    multiple=True,
+    type=click.Choice(RESOURCE_TYPE_CHOICES),
+    help="Filter by resource type (repeatable).",
+)
+@click.option(
+    "--resource",
+    "-r",
+    multiple=True,
+    help="Filter by specific resource name (repeatable).",
+)
+@click.option(
+    "--directory",
+    "-d",
+    type=click.Path(),
+    default=".",
+    help="Output directory for exported files.",
+)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Overwrite existing files.",
+)
+@click.pass_context
+def export_cmd(
+    ctx: click.Context,
+    cluster: str,
+    resource_type: tuple[str, ...],
+    resource: tuple[str, ...],
+    directory: str,
+    force: bool,
+) -> None:
+    """Export resources from a cluster to local JSON files."""
+    console = Console(no_color=ctx.obj.get("no_color", False))
+
+    try:
+        config = load_config(ctx.obj["config_path"])
+        if cluster not in config.clusters:
+            available = ", ".join(sorted(config.clusters.keys()))
+            raise ElasticodeError(
+                f"Cluster '{cluster}' not found in config. Available: {available}"
+            )
+
+        client = create_client(config.clusters[cluster])
+        output_dir = Path(directory).resolve()
+
+        rtypes = [RESOURCE_TYPE_MAP[rt] for rt in resource_type] if resource_type else None
+        rnames = list(resource) if resource else None
+
+        result = export_resources(
+            client=client,
+            cluster_name=cluster,
+            output_dir=output_dir,
+            resource_types=rtypes,
+            resource_names=rnames,
+            force=force,
+        )
+
+        for rtype, name in result.exported:
+            console.print(f"  [green]OK[/green]  {rtype.value}/{name}")
+
+        for rtype, name, reason in result.skipped:
+            console.print(f"  [yellow]SKIP[/yellow]  {rtype.value}/{name} ({reason})")
+
+        console.print(
+            f"\n[bold]Exported {result.exported_count} resource(s) from {cluster}.[/bold]"
+        )
+        if result.skipped_count:
+            console.print(
+                f"[yellow]Skipped {result.skipped_count} resource(s). "
+                f"Use --force to overwrite.[/yellow]"
+            )
+
+    except ElasticodeError as e:
+        console.print(f"[red]Error:[/red] {e.message}")
+        raise SystemExit(1) from None
 
 
 @main.command()

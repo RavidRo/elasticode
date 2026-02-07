@@ -72,3 +72,34 @@ class TestIlmPolicyHandler:
         assert "modified_date_millis" not in result
         assert "in_use_by" not in result
         assert "policy" in result
+
+    def test_list_all_returns_all_policies(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ilm.get_lifecycle.return_value = {
+            "logs-policy": {"policy": {"phases": {"hot": {"actions": {}}}}},
+            "metrics-policy": {"policy": {"phases": {"delete": {"min_age": "90d"}}}},
+        }
+        handler = IlmPolicyHandler(mock_es_client)
+        result = handler.list_all()
+        assert len(result) == 2
+        assert "logs-policy" in result
+        assert "metrics-policy" in result
+
+    def test_list_all_empty(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ilm.get_lifecycle.return_value = {}
+        handler = IlmPolicyHandler(mock_es_client)
+        assert handler.list_all() == {}
+
+    def test_list_all_normalizes_bodies(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ilm.get_lifecycle.return_value = {
+            "logs-policy": {
+                "policy": {"phases": {}},
+                "version": 2,
+                "modified_date": "2024-01-01",
+                "in_use_by": {"indices": []},
+            }
+        }
+        handler = IlmPolicyHandler(mock_es_client)
+        result = handler.list_all()
+        assert "version" not in result["logs-policy"]
+        assert "modified_date" not in result["logs-policy"]
+        assert "in_use_by" not in result["logs-policy"]

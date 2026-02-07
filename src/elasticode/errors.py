@@ -25,5 +25,9 @@ class ApplyError(ElasticodeError):
     """Raised when applying changes to the cluster fails."""
 
 
+class ExportError(ElasticodeError):
+    """Raised when exporting resources from a cluster fails."""
+
+
 class ConnectionError(ElasticodeError):
     """Raised when unable to connect to the Elasticsearch cluster."""

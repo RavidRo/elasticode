@@ -57,3 +57,27 @@ class TestIngestPipelineHandler:
         result = handler.normalize(body)
         assert "version" not in result
         assert result["description"] == "test"
+
+    def test_list_all_returns_all_pipelines(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ingest.get_pipeline.return_value = {
+            "parse-logs": {"description": "Parse", "processors": []},
+            "enrich-data": {"description": "Enrich", "processors": []},
+        }
+        handler = IngestPipelineHandler(mock_es_client)
+        result = handler.list_all()
+        assert len(result) == 2
+        assert "parse-logs" in result
+        assert "enrich-data" in result
+
+    def test_list_all_empty(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ingest.get_pipeline.return_value = {}
+        handler = IngestPipelineHandler(mock_es_client)
+        assert handler.list_all() == {}
+
+    def test_list_all_normalizes_bodies(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.ingest.get_pipeline.return_value = {
+            "parse-logs": {"description": "Parse", "processors": [], "version": 4}
+        }
+        handler = IngestPipelineHandler(mock_es_client)
+        result = handler.list_all()
+        assert "version" not in result["parse-logs"]

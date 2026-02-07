@@ -114,3 +114,20 @@ class Plan:
     @property
     def unchanged(self) -> list[PlanItem]:
         return [i for i in self.items if i.action == ResourceAction.NO_CHANGE]
+
+
+@dataclass(frozen=True)
+class ExportResult:
+    """Result of an export operation."""
+
+    cluster_name: str
+    exported: list[tuple[ResourceType, str]] = field(default_factory=list)
+    skipped: list[tuple[ResourceType, str, str]] = field(default_factory=list)
+
+    @property
+    def exported_count(self) -> int:
+        return len(self.exported)
+
+    @property
+    def skipped_count(self) -> int:
+        return len(self.skipped)

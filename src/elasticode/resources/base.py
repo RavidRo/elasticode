@@ -48,3 +48,11 @@ class ResourceHandler(ABC):
         Strips server-managed fields that should not be included in diffs.
         """
         ...
+
+    @abstractmethod
+    def list_all(self) -> dict[str, dict[str, Any]]:
+        """List all resources of this type from Elasticsearch.
+
+        Returns a dict mapping resource name to normalized body.
+        """
+        ...

@@ -57,3 +57,31 @@ class TestComponentTemplateHandler:
         body: dict[str, Any] = {"template": {}, "version": 5}
         result = handler.normalize(body)
         assert "version" not in result
+
+    def test_list_all_returns_all_templates(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.cluster.get_component_template.return_value = {
+            "component_templates": [
+                {"name": "base", "component_template": {"template": {"settings": {}}}},
+                {"name": "mappings", "component_template": {"template": {"mappings": {}}}},
+            ]
+        }
+        handler = ComponentTemplateHandler(mock_es_client)
+        result = handler.list_all()
+        assert len(result) == 2
+        assert "base" in result
+        assert "mappings" in result
+
+    def test_list_all_empty(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.cluster.get_component_template.return_value = {"component_templates": []}
+        handler = ComponentTemplateHandler(mock_es_client)
+        assert handler.list_all() == {}
+
+    def test_list_all_normalizes_bodies(self, mock_es_client: MagicMock) -> None:
+        mock_es_client.cluster.get_component_template.return_value = {
+            "component_templates": [
+                {"name": "base", "component_template": {"template": {}, "version": 5}}
+            ]
+        }
+        handler = ComponentTemplateHandler(mock_es_client)
+        result = handler.list_all()
+        assert "version" not in result["base"]

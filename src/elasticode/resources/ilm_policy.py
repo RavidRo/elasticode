@@ -42,3 +42,7 @@ class IlmPolicyHandler(ResourceHandler):
         for key in _SERVER_MANAGED_FIELDS:
             normalized.pop(key, None)
         return normalized
+
+    def list_all(self) -> dict[str, dict[str, Any]]:
+        response = self._client.ilm.get_lifecycle()
+        return {name: self.normalize(body) for name, body in response.items()}

@@ -40,3 +40,8 @@ class IndexTemplateHandler(ResourceHandler):
         for key in ("version",):
             normalized.pop(key, None)
         return normalized
+
+    def list_all(self) -> dict[str, dict[str, Any]]:
+        response = self._client.indices.get_index_template(name="*")
+        templates: list[dict[str, Any]] = response.get("index_templates", [])
+        return {t["name"]: self.normalize(t["index_template"]) for t in templates}

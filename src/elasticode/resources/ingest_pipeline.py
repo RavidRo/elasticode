@@ -39,3 +39,7 @@ class IngestPipelineHandler(ResourceHandler):
         for key in ("version",):
             normalized.pop(key, None)
         return normalized
+
+    def list_all(self) -> dict[str, dict[str, Any]]:
+        response = self._client.ingest.get_pipeline()
+        return {name: self.normalize(body) for name, body in response.items()}
