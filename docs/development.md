@@ -35,6 +35,7 @@ The project includes a `Taskfile.yml` for common contributor workflows. Run `tas
 | `task typecheck` | Run mypy strict type checking |
 | `task check` | Run all checks (lint, typecheck, format, tests) |
 | `task run` | Run the elasticode CLI |
+| `task dev:up` | Start local Elasticsearch and Kibana |
 
 Most tasks accept extra arguments via `--`, for example: `task test -- tests/test_config.py -v`
 
@@ -81,6 +82,77 @@ task check
 ```
 
 This runs lint, typecheck, format check, and tests in parallel, then reports results.
+
+## Local development with Docker
+
+For testing against a real Elasticsearch cluster, the project includes a docker-compose setup with Elasticsearch 8.17.0 and Kibana.
+
+### Start the local cluster
+
+```bash
+task dev:up
+```
+
+This starts Elasticsearch on port 9200 and Kibana on port 5601. Wait for the health checks to pass (about 30 seconds).
+
+### Test Elasticode against the local cluster
+
+Create a test `clusters.yaml`:
+
+```yaml
+clusters:
+  local:
+    url: http://localhost:9200
+    auth:
+      type: basic
+      username: elastic
+      password: changeme
+    tls:
+      verify: false
+```
+
+Then run Elasticode commands:
+
+```bash
+# Initialize a test project
+task run -- init --directory /tmp/elasticode-test
+cd /tmp/elasticode-test
+
+# Create the clusters.yaml with the local config above
+# Add some test resources to index_templates/, ilm_policies/, etc.
+
+# Plan changes
+task run -- plan --cluster local --config clusters.yaml
+
+# Apply changes
+task run -- apply --cluster local --config clusters.yaml
+```
+
+### View logs
+
+```bash
+task dev:logs              # Follow all logs
+task dev:logs -- elasticsearch  # Just ES logs
+task dev:logs -- kibana         # Just Kibana logs
+```
+
+### Check cluster status
+
+```bash
+task dev:status
+```
+
+### Stop the cluster
+
+```bash
+task dev:down
+```
+
+### Access Kibana
+
+Open http://localhost:5601 in your browser and log in with:
+- Username: `elastic`
+- Password: `changeme`
 
 ## Project structure
 

@@ -61,3 +61,8 @@ tasks:
     desc: Run the elasticode CLI
     cmds:
       - uv run elasticode {{.CLI_ARGS}}
+
+  dev:up:
+    desc: Start local Elasticsearch and Kibana for development
+    cmds:
+      - docker compose up -d
