@@ -66,3 +66,29 @@ tasks:
     desc: Start local Elasticsearch and Kibana for development
     cmds:
       - docker compose up -d
+
+  version:show:
+    desc: Show current version and available bumps
+    cmds:
+      - uv run bump-my-version show current_version
+      - uv run bump-my-version show-bump
+
+  version:patch:
+    desc: Bump patch version (0.1.0 → 0.1.1)
+    cmds:
+      - uv run bump-my-version bump patch
+
+  version:minor:
+    desc: Bump minor version (0.1.0 → 0.2.0)
+    cmds:
+      - uv run bump-my-version bump minor
+
+  version:major:
+    desc: Bump major version (0.1.0 → 1.0.0)
+    cmds:
+      - uv run bump-my-version bump major
+
+  version:dry-run:
+    desc: Preview version bump changes (patch)
+    cmds:
+      - uv run bump-my-version bump patch --dry-run --allow-dirty --verbose
