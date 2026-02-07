@@ -9,7 +9,11 @@ from elasticode.resources.component_template import ComponentTemplateHandler
 
 
 def _make_not_found() -> NotFoundError:
-    return NotFoundError(404, "not_found", {"error": "not found"})
+    meta = MagicMock()
+    meta.status = 404
+    return NotFoundError(
+        "Resource not found", meta, {"error": {"type": "resource_not_found_exception"}}
+    )
 
 
 class TestComponentTemplateHandler:

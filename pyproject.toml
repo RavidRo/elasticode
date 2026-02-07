@@ -9,9 +9,7 @@ description = "Declaratively manage Elasticsearch 8.x resources with a Terraform
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13"
-authors = [
-    { name = "Ravid Rom", email = "romravid@gmail.com" },
-]
+authors = [{ name = "Ravid Rom", email = "romravid@gmail.com" }]
 keywords = ["elasticsearch", "infrastructure", "declarative", "IaC"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -53,19 +51,7 @@ src = ["src", "tests"]
 line-length = 100
 
 [tool.ruff.lint]
-select = [
-    "E",
-    "W",
-    "F",
-    "I",
-    "N",
-    "UP",
-    "B",
-    "SIM",
-    "TCH",
-    "RUF",
-    "PTH",
-]
+select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "TCH", "RUF", "PTH"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["elasticode"]
@@ -81,9 +67,10 @@ check_untyped_defs = true
 no_implicit_reexport = true
 mypy_path = "src"
 
+# Type check tests as well
 [[tool.mypy.overrides]]
-module = "elasticsearch.*"
-ignore_missing_imports = true
+module = "tests.*"
+disallow_untyped_defs = false  # Tests can be less strict
 
 [[tool.mypy.overrides]]
 module = "deepdiff.*"
@@ -92,11 +79,5 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "-ra",
-]
-markers = [
-    "integration: marks tests requiring a live Elasticsearch cluster",
-]
+addopts = ["--strict-markers", "--strict-config", "-ra"]
+markers = ["integration: marks tests requiring a live Elasticsearch cluster"]

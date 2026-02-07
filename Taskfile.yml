@@ -49,7 +49,7 @@ tasks:
   typecheck:
     desc: Run mypy strict type checking
     cmds:
-      - uv run mypy src/
+      - uv run mypy src/ tests/
 
   check:
     desc: Run all checks (lint, typecheck, format check, tests)

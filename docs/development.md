@@ -63,7 +63,7 @@ Skip integration tests (default): `task test -- -m "not integration"`
 task typecheck
 ```
 
-Elasticode uses mypy in strict mode. All source code must be fully typed.
+Elasticode uses mypy in strict mode. All source code must be fully typed. Tests are also type-checked but with relaxed rules.
 
 ## Linting and formatting
 
