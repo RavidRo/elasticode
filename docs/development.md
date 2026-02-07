@@ -4,6 +4,7 @@
 
 - Python 3.13+
 - [uv](https://docs.astral.sh/uv/) (recommended) or pip
+- [Task](https://taskfile.dev/) (optional, for running common commands via `Taskfile.yml`)
 
 ## Setup
 
@@ -13,40 +14,53 @@ git clone https://github.com/ravidrom/elasticode.git
 cd elasticode
 
 # Install dependencies (including dev tools)
-uv sync
+task install
+# or: uv sync
 ```
+
+## Taskfile
+
+The project includes a `Taskfile.yml` for common contributor workflows. Run `task --list` to see all available tasks:
+
+| Command | Description |
+|---|---|
+| `task install` | Install all dependencies (including dev tools) |
+| `task test` | Run the test suite |
+| `task test:verbose` | Run tests with verbose output |
+| `task test:cov` | Run tests with coverage report |
+| `task lint` | Run ruff linter |
+| `task lint:fix` | Auto-fix linting issues |
+| `task format` | Format code with ruff |
+| `task format:check` | Check formatting without applying changes |
+| `task typecheck` | Run mypy strict type checking |
+| `task check` | Run all checks (lint, typecheck, format, tests) |
+| `task run` | Run the elasticode CLI |
+
+Most tasks accept extra arguments via `--`, for example: `task test -- tests/test_config.py -v`
 
 ## Running the CLI locally
 
 ```bash
-uv run elasticode --help
-uv run elasticode init --directory /tmp/test-project
-uv run elasticode validate --config /tmp/test-project/clusters.yaml
+task run -- --help
+task run -- init --directory /tmp/test-project
+# or directly: uv run elasticode --help
 ```
 
 ## Tests
 
 ```bash
-# Run all tests
-uv run pytest
-
-# Run with verbose output
-uv run pytest -v
-
-# Run a specific test file
-uv run pytest tests/test_config.py
-
-# Run with coverage
-uv run pytest --cov=elasticode --cov-report=term-missing
-
-# Skip integration tests (default)
-uv run pytest -m "not integration"
+task test                          # Run all tests
+task test:verbose                  # Verbose output
+task test -- tests/test_config.py  # Specific file
+task test:cov                      # With coverage report
 ```
+
+Skip integration tests (default): `task test -- -m "not integration"`
 
 ## Type checking
 
 ```bash
-uv run mypy src/
+task typecheck
 ```
 
 Elasticode uses mypy in strict mode. All source code must be fully typed.
@@ -54,15 +68,19 @@ Elasticode uses mypy in strict mode. All source code must be fully typed.
 ## Linting and formatting
 
 ```bash
-# Check for lint issues
-uv run ruff check src/ tests/
-
-# Auto-fix fixable issues
-uv run ruff check src/ tests/ --fix
-
-# Format code
-uv run ruff format src/ tests/
+task lint         # Check for lint issues
+task lint:fix     # Auto-fix fixable issues
+task format       # Format code
+task format:check # Check without applying
 ```
+
+## Run all checks at once
+
+```bash
+task check
+```
+
+This runs lint, typecheck, format check, and tests in parallel, then reports results.
 
 ## Project structure
 

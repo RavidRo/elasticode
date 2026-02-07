@@ -1,0 +1,63 @@
+version: '3'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  install:
+    desc: Install all dependencies (including dev tools)
+    cmds:
+      - uv sync
+
+  test:
+    desc: Run the test suite
+    cmds:
+      - uv run pytest {{.CLI_ARGS}}
+
+  test:verbose:
+    desc: Run tests with verbose output
+    cmds:
+      - uv run pytest -v {{.CLI_ARGS}}
+
+  test:cov:
+    desc: Run tests with coverage report
+    cmds:
+      - uv run pytest --cov=elasticode --cov-report=term-missing {{.CLI_ARGS}}
+
+  lint:
+    desc: Run ruff linter
+    cmds:
+      - uv run ruff check src/ tests/
+
+  lint:fix:
+    desc: Auto-fix linting issues
+    cmds:
+      - uv run ruff check src/ tests/ --fix
+
+  format:
+    desc: Format code with ruff
+    cmds:
+      - uv run ruff format src/ tests/
+
+  format:check:
+    desc: Check code formatting without applying changes
+    cmds:
+      - uv run ruff format --check src/ tests/
+
+  typecheck:
+    desc: Run mypy strict type checking
+    cmds:
+      - uv run mypy src/
+
+  check:
+    desc: Run all checks (lint, typecheck, format check, tests)
+    deps: [lint, typecheck, format:check]
+    cmds:
+      - uv run pytest
+
+  run:
+    desc: Run the elasticode CLI
+    cmds:
+      - uv run elasticode {{.CLI_ARGS}}
